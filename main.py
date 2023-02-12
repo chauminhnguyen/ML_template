@@ -39,7 +39,7 @@ model = VGG16(3, 10).to('cuda:0')
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 criterion = Distillation_Loss(0.9, 0.5)
-training = DistillationTraining(model, teacher_model, trainloader, testloader, optimizer, criterion, 'cuda:0', num_epochs=2)
+training = DistillationTraining(model, teacher_model, trainloader, testloader, optimizer, criterion, 'cuda:0', num_epochs=5)
 print("Training...")
 training.train()
 

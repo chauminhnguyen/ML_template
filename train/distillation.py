@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from .base import BaseTrain
 from tqdm import tqdm
+import os
 
 class DistillationTraining(BaseTrain):
     def __init__(self, model, teacher_model, train_loader, val_loader, optimizer, criterion, device, lr_scheduler=None, num_epochs=10):
@@ -44,6 +45,8 @@ class DistillationTraining(BaseTrain):
         return val_acc
     
     def save(self, path):
+        if not os.path.exists("checkpoints"):
+            os.mkdir("checkpoints")
         torch.save(self.model.state_dict(), path)
 
     def load(self, path):
