@@ -19,6 +19,8 @@ class BaseTrain:
         if pretrained_model_path is not None:
             print("Loading pretrained model...")
             self.load(pretrained_model_path)
+        else:
+            print("Training from scratch...")
 
     def train(self):
         raise NotImplementedError

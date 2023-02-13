@@ -6,7 +6,7 @@ import os
 
 class DistillationTraining(BaseTrain):
     def __init__(self, model, teacher_model, train_loader, val_loader, optimizer, criterion, device, pretrained_model_path=None, lr_scheduler=None, num_epochs=10):
-        super(DistillationTraining, self).__init__(model, train_loader, val_loader, optimizer, criterion, device, lr_scheduler, num_epochs)
+        super(DistillationTraining, self).__init__(model, train_loader, val_loader, optimizer, criterion, device, pretrained_model_path, lr_scheduler, num_epochs)
         self.teacher_model = teacher_model
     
     def train(self):
