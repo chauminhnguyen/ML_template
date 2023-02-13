@@ -6,7 +6,7 @@ from data import CSVDataset, FolderDataset
 import numpy as np
 
 class BaseTrain:
-    def __init__(self, model, train_loader, val_loader, optimizer, criterion, device, lr_scheduler=None, num_epochs=10):
+    def __init__(self, model, train_loader, val_loader, optimizer, criterion, device, pretrained_model_path=None, lr_scheduler=None, num_epochs=10):
         self.model = model
         self.train_loader = train_loader
         self.val_loader = val_loader
@@ -15,6 +15,10 @@ class BaseTrain:
         self.device = device
         self.lr_scheduler = lr_scheduler
         self.num_epochs = num_epochs
+        self.pretrained_model_path = pretrained_model_path
+        if pretrained_model_path is not None:
+            print("Loading pretrained model...")
+            self.load(pretrained_model_path)
 
     def train(self):
         raise NotImplementedError
@@ -34,10 +38,11 @@ class BaseTrain:
 
 
 class BasicTraining(BaseTrain):
-    def __init__(self, model, train_loader, val_loader, optimizer, criterion, device, lr_scheduler=None, num_epochs=10):
+    def __init__(self, model, train_loader, val_loader, optimizer, criterion, device, pretrained_model_path=None, lr_scheduler=None, num_epochs=10):
         super(BasicTraining, self).__init__(model, train_loader, val_loader, optimizer, criterion, device, lr_scheduler, num_epochs)
 
     def train(self):
+        print("Training...")
         self.model.train()
         for epoch in range(self.num_epochs):
             for batch_idx, (data, targets) in enumerate(self.train_loader):

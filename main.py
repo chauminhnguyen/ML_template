@@ -9,6 +9,7 @@ import torchvision.transforms as transforms
 import torchvision
 # from torchvision.models import vgg16, VGG16_Weights
 from loss import Distillation_Loss
+from infer import test
 
 # model = VGG16(3, 10).to('cuda:0')
 # sample = torch.randn(1, 3, 224, 224).to('cuda:0')
@@ -19,14 +20,18 @@ transform = transforms.Compose(
      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
      transforms.Resize((224, 224))])
 
+# model = VGG16(3, 10)
+# model.load_state_dict(torch.load('pretrained/distillation_4.pth'))
+# test(model, 'test/download.jpg', transform)
+
 batch_size = 4
 
-trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
+trainset = torchvision.datasets.CIFAR10(root='./dataset', train=True,
                                         download=True, transform=transform)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
                                           shuffle=True, num_workers=0)
 
-testset = torchvision.datasets.CIFAR10(root='./data', train=False,
+testset = torchvision.datasets.CIFAR10(root='./dataset', train=False,
                                        download=True, transform=transform)
 testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
                                          shuffle=False, num_workers=0)
@@ -39,8 +44,7 @@ model = VGG16(3, 10).to('cuda:0')
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 criterion = Distillation_Loss(0.9, 0.5)
-training = DistillationTraining(model, teacher_model, trainloader, testloader, optimizer, criterion, 'cuda:0', num_epochs=5)
-print("Training...")
+training = DistillationTraining(model, teacher_model, trainloader, testloader, optimizer, criterion, 'cuda:0', pretrained_model_path='distillation_4.pth', num_epochs=5)
 training.train()
 
 # data = CSVDataset('iris.csv')
