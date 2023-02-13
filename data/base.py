@@ -2,15 +2,18 @@ import torch
 import torch.nn as nn
 import os
 import pandas as pd
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+import cv2
+import numpy as np
 
 
 class BaseDataset(torch.utils.data.Dataset):
-    def __init__(self, path, transform=None):
+    def __init__(self, path, batch_size=1, transform=None):
         self.inputs = []
         self.labels = []
         self.transform = transform
         self.path = path
+        self.batch_size = batch_size
         self.load_data()
 
     def load_data(self):
@@ -31,19 +34,38 @@ class BaseDataset(torch.utils.data.Dataset):
 
 
 class FolderDataset(BaseDataset):
-    def __init__(self, path, transform=None):
-        super(FolderDataset, self).__init__(path, transform)
+    def __init__(self, path, batch_size=1, transform=None):
+        super(FolderDataset, self).__init__(path, batch_size, transform)
 
     def load_data(self):
         self.inputs = []
         self.labels = []
+        
         for label in os.listdir(self.path):
-            for input in os.listdir(os.path.join(self.path, label)):
-                self.inputs.append(os.path.join(self.path, label, input))
+            for file in os.listdir(os.path.join(self.path, label)):
+                self.inputs.append(os.path.join(self.path, label, file))
                 self.labels.append(label)
-
+        self.labels = LabelEncoder().fit_transform(np.array(self.labels).reshape(-1, 1))
         self.df = pd.DataFrame({'input': self.inputs, 'label': self.labels})
 
+
+class ImageFolderDataset(FolderDataset):
+    def __init__(self, path, batch_size=1, transform=None):
+        super(ImageFolderDataset, self).__init__(path, batch_size, transform)
+
+    def load_data(self):
+        super(ImageFolderDataset, self).load_data()
+    
+    def __getitem__(self, index):
+        row = self.df.iloc[index]
+        input = row['input']
+        label = row['label']
+        input = cv2.imread(input)
+        if self.transform:
+            input = self.transform(input)
+        input = input.unsqueeze(0)
+        return input, label
+    
 
 class CSVDataset(BaseDataset):
     def __init__(self, path, transform=None):

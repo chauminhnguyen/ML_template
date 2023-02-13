@@ -4,6 +4,8 @@ import torch.nn.functional as F
 import torchvision.transforms as transforms
 from data import CSVDataset, FolderDataset
 import numpy as np
+from tqdm import tqdm
+
 
 class BaseTrain:
     def __init__(self, model, train_loader, val_loader, optimizer, criterion, device, pretrained_model_path=None, lr_scheduler=None, num_epochs=10):
@@ -44,16 +46,16 @@ class BasicTraining(BaseTrain):
         super(BasicTraining, self).__init__(model, train_loader, val_loader, optimizer, criterion, device, lr_scheduler, num_epochs)
 
     def train(self):
-        print("Training...")
         self.model.train()
         for epoch in range(self.num_epochs):
-            for batch_idx, (data, targets) in enumerate(self.train_loader):
+            for batch_idx, (data, targets) in tqdm(enumerate(self.train_loader)):
 
                 data = torch.tensor(data).to(self.device)
-                targets = torch.tensor(targets).to(self.device).unsqueeze(0)
+                targets = torch.tensor(targets).to(self.device)
 
                 # forward
                 scores = self.model(data)
+
                 loss = self.criterion(scores, targets)
 
                 # backward

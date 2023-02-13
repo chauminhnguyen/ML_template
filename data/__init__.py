@@ -1,1 +1,1 @@
-from .base import FolderDataset, CSVDataset, DBSCANBatchDataset
+from .base import FolderDataset, CSVDataset, DBSCANBatchDataset, ImageFolderDataset
