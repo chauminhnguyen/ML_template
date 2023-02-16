@@ -46,6 +46,9 @@ class FolderDataset(BaseDataset):
                 self.inputs.append(os.path.join(self.path, label, file))
                 self.labels.append(label)
         self.labels = LabelEncoder().fit_transform(np.array(self.labels).reshape(-1, 1))
+
+        self.inputs = [self.inputs[i:i + self.batch_size] for i in range(0, len(self.inputs), self.batch_size)]
+        self.labels = [self.labels[i:i + self.batch_size] for i in range(0, len(self.labels), self.batch_size)]
         self.df = pd.DataFrame({'input': self.inputs, 'label': self.labels})
 
 
@@ -60,10 +63,11 @@ class ImageFolderDataset(FolderDataset):
         row = self.df.iloc[index]
         input = row['input']
         label = row['label']
-        input = cv2.imread(input)
+        inputs = [cv2.imread(img) for img in input]
+        
         if self.transform:
-            input = self.transform(input)
-        input = input.unsqueeze(0)
+            inputs = [self.transform(img) for img in inputs]
+        input = torch.stack(inputs)
         return input, label
     
 
